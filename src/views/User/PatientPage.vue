@@ -42,7 +42,9 @@ const onClickRight = async () => {
   const { sex } = validate.getInfo(patient.value.idCard)
   if (patient.value.gender !== sex) return showToast('性别和身份证不符')
   patient.value.id ? await editPatient(patient.value) : await addPatient(patient.value)
+  initPatientList()
   showSuccessToast(patient.value.id ? '编辑成功' : '添加成功')
+  show.value = false
   patient.value = initpatient
 }
 const initpatient: PatientType = {
@@ -61,6 +63,7 @@ const remove = async () => {
     })
     await delPatient(patient.value.id)
     show.value = false
+    initPatientList()
     showSuccessToast('删除成功')
   }
 }

@@ -3,13 +3,22 @@
 
 import router from '@/router'
 import { useUserStore } from '@/stores/user'
-
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 // 白名单列表
 const whiteList = ['/login', '/register', '/404', '/401']
 
 router.beforeEach((to, from) => {
+  NProgress.start()
   const store = useUserStore()
   // 如果没有token, 并且进入的页面也不是login/register/404/401等页面,则直接进入到登录页面
   document.title = '医疗问诊 - ' + to.meta.title
   if (!store.user?.token && !whiteList.includes(to.path)) return '/login'
 })
+
+router.afterEach((to) => {
+  // 修改标题
+  document.title = `149优医问诊-${to.meta.title || ''}`
+  NProgress.done()
+})
+NProgress.configure({ showSpinner: false })

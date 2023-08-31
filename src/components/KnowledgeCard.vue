@@ -14,7 +14,7 @@ const { loading, follow } = useFollow('knowledge')
           {{ item.creatorHospatalName }} {{ item.creatorDep }} {{ item.creatorTitles }}
         </p>
       </div>
-      <van-button @click="follow(item)" class="btn" size="small" round>
+      <van-button :loading="loading" @click="follow(item)" class="btn" size="small" round>
         {{ item.likeFlag === 1 ? '已关注' : '+ 关注' }}
       </van-button>
     </div>

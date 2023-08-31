@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import type { Doctor } from '@/types/Knowledge'
-
+import { followDoctor } from '@/services/consult'
+import { ref } from 'vue'
+import { useFollow } from '@/views/Home/composable'
 defineProps<{ item: Doctor }>()
+const { loading, follow } = useFollow()
 </script>
 <template>
   <div class="doctor-card">
@@ -9,7 +12,7 @@ defineProps<{ item: Doctor }>()
     <p class="name">{{ item.name }}</p>
     <p class="van-ellipsis">{{ item.hospitalName }} {{ item.depName }}</p>
     <p>{{ item.positionalTitles }}</p>
-    <van-button round size="small" type="primary">
+    <van-button @click="follow(item)" round size="small" type="primary">
       {{ item.likeFlag === 1 ? '已关注' : '+ 关注' }}
     </van-button>
   </div>

@@ -1,5 +1,5 @@
 import { ConsultType } from '@/enums'
-import type { PartialConsult } from '@/types/consult'
+import type { PartialConsult, ConsultIllness } from '@/types/consult'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 export const useConsultStore = defineStore(

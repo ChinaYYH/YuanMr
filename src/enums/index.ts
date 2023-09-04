@@ -10,7 +10,7 @@ export enum ConsultType {
 // 问诊时间，以1自增可以省略
 export enum IllnessTime {
   // 一周内
-  week = 1,
+  Week = 1,
   // 一月内
   Month,
   // 半年内

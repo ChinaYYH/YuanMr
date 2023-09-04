@@ -6,8 +6,10 @@ import type {
   Image,
   ConsultOrderPreParams,
   ConsultOrderPreData,
-  PartialConsult
+  PartialConsult,
+  ConsultOrderItem
 } from '@/types/consult'
+import type { ConsultOrderListParams, ConsultOrderPage } from '@/types/user'
 import type { PatientList } from '@/types/user.d'
 
 export const getKnowledgePage = (params: KnowledgeParams) =>
@@ -40,3 +42,13 @@ export const getConsultOrderPayUrl = (params: {
   orderId: string
   payCallback: string
 }) => request<{ payUrl: string }>('/patient/consult/pay', 'POST', params)
+
+export const getConsultOrderList = (params: ConsultOrderListParams) =>
+  request<ConsultOrderPage>('/patient/consult/order/list', 'GET', params)
+
+export const getConsultOrderDetail = (orderId: string) =>
+  request<ConsultOrderItem>('/patient/consult/order/detail', 'GET', { orderId })
+// 取消订单
+export const cancelOrder = (id: string) => request(`/patient/order/cancel/${id}`, 'PUT')
+// 删除订单
+export const deleteOrder = (id: string) => request(`/patient/order/${id}`, 'DELETE')

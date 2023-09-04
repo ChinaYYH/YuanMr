@@ -91,6 +91,13 @@ const router = createRouter({
       meta: {
         title: '问诊支付'
       }
+    },
+    {
+      path: '/user/consult',
+      component: () => import('@/views/User/ConsultPage.vue'),
+      meta: {
+        title: '问诊记录'
+      }
     }
   ]
 })

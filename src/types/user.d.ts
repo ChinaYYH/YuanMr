@@ -43,3 +43,17 @@ type PatientType = {
 }
 
 export type PatientList = PatientType[]
+
+export type ConsultOrderListParams = PageParams & {
+  // 问诊记录类型
+  type: ConsultType
+}
+
+export type ConsultOrderPage = {
+  // 总⻚数
+  pageTotal: number
+  // 总条数
+  total: number
+  // 列表数据
+  rows: ConsultOrderItem[]
+}

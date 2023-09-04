@@ -14,9 +14,24 @@ import { ConsultType } from '@/enums'
 </template>
 
 <style lang="scss" scoped>
-.consult-page {
+.consult-item {
   padding-top: 46px;
   background-color: var(--cp-bg);
-  min-height: calc(100vh - 46px);
+}
+::v-deep {
+  .van-tabs {
+    .van-tabs__nav {
+      padding: 0 0 15px 0;
+    }
+
+    .van-tabs__line {
+      width: 45px;
+      background-color: var(--cp-primary);
+    }
+
+    .van-tab {
+      padding: 0 15px;
+    }
+  }
 }
 </style>

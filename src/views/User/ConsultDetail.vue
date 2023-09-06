@@ -1,14 +1,24 @@
 <script setup lang="ts">
 import { OrderType } from '@/enums'
-import { getConsultOrderDetail, cancelOrder, deleteOrder } from '@/services/consult'
+import {
+  getConsultOrderDetail,
+  cancelOrder,
+  deleteOrder,
+  getConsultOrderPre,
+  getConsultOrderPayUrl,
+  createConsultOrder
+} from '@/services/consult'
 import type { ConsultOrderItem } from '@/types/consult'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { showSuccessToast, showFailToast } from 'vant'
+import { showSuccessToast, showFailToast, showConfirmDialog, showToast } from 'vant'
 import router from '@/router'
+import { useConsultStore } from '@/stores/modules/consult'
+const orderId = ref('')
 const route = useRoute()
 const item = ref<ConsultOrderItem>()
 onMounted(async () => {
+  orderId.value = route.params.id as string
   const res = await getConsultOrderDetail(route.params.id as string)
   item.value = res.data
 })
@@ -42,6 +52,57 @@ const deleteConsultOrder = async (item: ConsultOrderItem) => {
     .finally(() => {
       loading.value = false
     })
+}
+const show = ref(false)
+
+const payInfo = ref<any>()
+const store = useConsultStore()
+// const loadData = async () => {
+//   const res = await getConsultOrderPre({
+//     type: store.consult.type,
+//     illnessType: store.consult.illnessType
+//   })
+//   payInfo.value = res.data
+//   // 设置默认优惠券
+//   store.setCoupon(payInfo.value.couponId)
+// }
+const onClose = async () => {
+  try {
+    await showConfirmDialog({
+      title: '关闭支付',
+      message: '取消支付将无法获得医生回复，医生接诊名额有限，是否确认关闭？',
+      cancelButtonText: '仍要关闭',
+      confirmButtonText: '继续支付',
+      confirmButtonColor: 'var(--cp-primary)'
+    })
+    return false
+  } catch {
+    orderId.value = ''
+    router.push('/user/consult')
+    return true
+  }
+}
+// onMounted(() => {
+//   loadData()
+//   // loadPatient()
+// })
+// actualPayment
+const submit = async (item: ConsultOrderItem) => {
+  console.log(item)
+
+  // 打开
+  show.value = true
+}
+const paymentMethod = ref<0 | 1>()
+const pay = async () => {
+  if (paymentMethod.value === undefined) return showToast('请选择支付方式')
+  showToast('跳转支付')
+  const res = await getConsultOrderPayUrl({
+    orderId: orderId.value,
+    paymentMethod: paymentMethod.value,
+    payCallback: 'http://localhost/room'
+  })
+  window.location.href = res.data.payUrl
 }
 </script>
 
@@ -104,7 +165,34 @@ const deleteConsultOrder = async (item: ConsultOrderItem) => {
         <van-button type="default" :loading="loading" @click="cancelConsultOrder(item!)" round
           >取消问诊</van-button
         >
-        <van-button type="primary" round>继续支付</van-button>
+        <van-button type="primary" :loading="loading" @click="submit(item)" round
+          >立即支付</van-button
+        >
+        <van-action-sheet
+          :closeable="false"
+          v-model:show="show"
+          :close-on-popstate="false"
+          title="选择支付方式"
+          :onClose="onClose"
+        >
+          <div class="pay-type">
+            <p class="amount">￥{{ item.actualPayment.toFixed(2) }}</p>
+            <van-cell-group>
+              <van-cell title="微信支付" @click="paymentMethod = 0">
+                <template #icon><cp-icons name="consult-wechat" /></template>
+                <template #extra><van-checkbox :checked="paymentMethod === 0" /></template>
+              </van-cell>
+              <van-cell title="支付宝支付" @click="paymentMethod = 1">
+                <template #icon><cp-icons name="consult-alipay" /></template>
+
+                <template #extra><van-checkbox :checked="paymentMethod === 1" /></template>
+              </van-cell>
+              <div class="btn">
+                <van-button type="primary" @click="pay" round block>立即支付</van-button>
+              </div>
+            </van-cell-group>
+          </div>
+        </van-action-sheet>
       </div>
       <div class="detail-action van-hairline--top" v-if="item.status === OrderType.ConsultWait">
         <van-button type="default" :loading="loading" @click="cancelConsultOrder(item!)" round
@@ -313,6 +401,28 @@ const deleteConsultOrder = async (item: ConsultOrderItem) => {
   .van-count-down {
     display: inline;
     color: #f2994a;
+  }
+}
+.pay-type {
+  .amount {
+    padding: 20px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .btn {
+    padding: 15px;
+  }
+  .van-cell {
+    display: flex;
+    align-items: center;
+    .cp-icon {
+      margin-right: 10px;
+      font-size: 18px;
+    }
+    .van-checkbox :deep(.van-checkbox__icon) {
+      font-size: 16px;
+    }
   }
 }
 </style>

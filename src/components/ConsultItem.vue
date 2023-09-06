@@ -4,6 +4,8 @@ import type { ConsultOrderItem } from '@/types/consult'
 import { OrderType } from '@/enums'
 import { cancelOrder, deleteOrder } from '@/services/consult'
 import { showSuccessToast, showFailToast } from 'vant'
+import { useShowPrescription } from '@/composable/index'
+// const { showPrescription } = useShowPrescription()
 const emit = defineEmits(['on-delete'])
 const { item } = defineProps<{ item: ConsultOrderItem }>()
 const showPopover = ref(false)
@@ -42,10 +44,23 @@ const deleteConsultOrder = (item: ConsultOrderItem) => {
       deleteLoading.value = false
     })
 }
+
 const onSelect = (action: { text: string }, i: number) => {
+  showPrescription(item.prescriptionId)
   if (i === 1) {
     // 删除
     deleteConsultOrder(item)
+  }
+}
+import { getPrescriptionPic } from '@/services/consult'
+import { showImagePreview } from 'vant'
+
+const showPrescription = async (id?: string) => {
+  console.log(id)
+  if (id) {
+    const res = await getPrescriptionPic(id)
+    console.log(res)
+    showImagePreview([res.data.url])
   }
 }
 </script>
@@ -109,7 +124,14 @@ const onSelect = (action: { text: string }, i: number) => {
       </van-button>
     </div>
     <div class="foot" v-if="item.status === OrderType.ConsultChat">
-      <van-button v-if="item.prescriptionId" class="gray" plain size="small" round>
+      <van-button
+        @click="showPrescription(item.prescriptionId)"
+        v-if="item.prescriptionId"
+        class="gray"
+        plain
+        size="small"
+        round
+      >
         查看处方
       </van-button>
       <van-button type="primary" plain size="small" round :to="`/room?orderId=${item.id}`">
